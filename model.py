@@ -6,21 +6,11 @@ import torch
 from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-# Define skills and resources
 COMMON_SKILLS = [
     "python", "java", "sql", "excel", "communication", "project management",
     "data analysis", "machine learning", "leadership", "react", "cloud", "html",
     "css", "javascript", "public speaking", "finance", "teamwork", "problem solving"
 ]
-
-LEARNING_RESOURCES = {
-    "python": "https://www.coursera.org/specializations/python",
-    "sql": "https://www.udemy.com/course/sql-mysql-for-data-analytics/",
-    "excel": "https://www.udemy.com/course/microsoft-excel-all-in-one-package/",
-    "data analysis": "https://www.edx.org/learn/data-analysis",
-    "machine learning": "https://www.coursera.org/learn/machine-learning",
-    "public speaking": "https://www.coursera.org/learn/public-speaking"
-}
 
 def extract_skills(text):
     text = text.lower()
@@ -32,6 +22,15 @@ MODEL = torch.quantization.quantize_dynamic(MODEL, {torch.nn.Linear}, dtype=torc
 
 class JobRecommendationSystem:
     def __init__(self, jobs_csv):
+        self.LEARNING_RESOURCES = {
+            "python": "https://www.coursera.org/specializations/python",
+            "sql": "https://www.udemy.com/course/sql-mysql-for-data-analytics/",
+            "excel": "https://www.udemy.com/course/microsoft-excel-all-in-one-package/",
+            "data analysis": "https://www.edx.org/learn/data-analysis",
+            "machine learning": "https://www.coursera.org/learn/machine-learning",
+            "public speaking": "https://www.coursera.org/learn/public-speaking"
+        }
+
         self.jobs_df = pd.read_csv(jobs_csv)
         self.jobs_df["job_text"] = (
             self.jobs_df["workplace"].astype(str) + " " +
@@ -78,7 +77,7 @@ class JobRecommendationSystem:
             job = filtered_jobs_df.iloc[idx].to_dict()
             job_skills = [skill.strip().lower() for skill in str(job["requisite_skill"]).split(",") if skill]
             missing_skills = list(set(job_skills) - set(resume_skills))
-            suggestions = [LEARNING_RESOURCES[skill] for skill in missing_skills if skill in LEARNING_RESOURCES]
+            suggestions = [self.LEARNING_RESOURCES[skill] for skill in missing_skills if skill in self.LEARNING_RESOURCES]
 
             job["matched_skills"] = list(set(job_skills) & set(resume_skills))
             job["missing_skills"] = missing_skills
